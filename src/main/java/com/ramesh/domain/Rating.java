@@ -9,6 +9,9 @@ public class Rating {
     @Column(name = "RATING_ID")
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "PROJECT_ID")
+    private Project project;
+    @ManyToOne
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
     @ManyToOne
@@ -46,5 +49,13 @@ public class Rating {
 
     public void setValue(Integer value) {
         this.value = value;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
