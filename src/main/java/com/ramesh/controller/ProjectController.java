@@ -32,4 +32,9 @@ public class ProjectController {
        projectRepository.delete(projectId);
     }
 
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
+    public void updateProject(@PathVariable Long projectId, @RequestBody Project project) {
+        projectRepository.save(project);
+    }
+
 }

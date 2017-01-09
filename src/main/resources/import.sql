@@ -8,4 +8,15 @@ insert into criterion(CRITERION_ID, CRITERION_NAME, WEIGHT) VALUES (2, 'Criterio
 insert into criterion(CRITERION_ID, CRITERION_NAME, WEIGHT) VALUES (3, 'Criterion3', 30);
 insert into criterion(CRITERION_ID, CRITERION_NAME, WEIGHT) VALUES (4, 'Criterion4', 40);
 
+insert into project(project_id, project_name) values (1, 'Project 1');
+insert into project_products values (1, 1);
+insert into project_products values (1, 2);
+insert into project_criteria values (1, 1);
+insert into project_criteria values (1, 2);
 
+
+insert into project(project_id, project_name) values (2, 'Project 2');
+insert into project_products values (2, 3);
+insert into project_products values (2, 4);
+insert into project_criteria values (2, 3);
+insert into project_criteria values (2, 4);
