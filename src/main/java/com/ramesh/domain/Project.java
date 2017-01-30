@@ -12,10 +12,10 @@ public class Project {
     private Long id;
     @Column(name = "PROJECT_NAME")
     private String name;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
     private Set<Product> products;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
     private Set<Criterion> criteria;
 
