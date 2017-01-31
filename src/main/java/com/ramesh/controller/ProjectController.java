@@ -34,6 +34,7 @@ public class ProjectController {
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
     public void updateProject(@PathVariable Long projectId, @RequestBody Project project) {
+        project.setId(projectId);
         projectRepository.save(project);
     }
 

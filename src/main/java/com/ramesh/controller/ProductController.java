@@ -7,29 +7,19 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 
 @RestController
-@RequestMapping(value = "/products")
+@RequestMapping(value = "/projects/{projectId}/products")
 public class ProductController {
     @Inject
     private ProductRepository productRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<Product> getProducts() {
-        return productRepository.findAll();
+    public Iterable<Product> getProducts(@PathVariable Long projectId) {
+        return productRepository.findAll(projectId);
     }
 
     @RequestMapping(value = "/{productId}", method = RequestMethod.GET)
-    public Product getProduct(@PathVariable Long productId) {
-        return productRepository.findOne(productId);
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public void createProduct(@RequestBody Product product) {
-        productRepository.save(product);
-    }
-
-    @RequestMapping(value = "/{productId}", method = RequestMethod.DELETE)
-    public void deleteProduct(@PathVariable Long productId) {
-        productRepository.delete(productId);
+    public Product getProduct(@PathVariable Long projectId, @PathVariable Long productId) {
+        return productRepository.findOne(projectId, productId);
     }
 
 }

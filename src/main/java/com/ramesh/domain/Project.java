@@ -1,8 +1,15 @@
 package com.ramesh.domain;
 
 
-import javax.persistence.*;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Project {
@@ -12,10 +19,10 @@ public class Project {
     private Long id;
     @Column(name = "PROJECT_NAME")
     private String name;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
     private Set<Product> products;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
     private Set<Criterion> criteria;
 
