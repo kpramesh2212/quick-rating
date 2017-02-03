@@ -17,6 +17,7 @@ public class Rating {
     @ManyToOne
     @JoinColumn(name = "CRITERION_ID")
     private Criterion criterion;
+
     private Integer value;
 
     public Long getId() {
