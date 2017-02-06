@@ -1,6 +1,8 @@
 package com.ramesh.domain;
 
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -10,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Project {
@@ -17,13 +20,19 @@ public class Project {
     @GeneratedValue
     @Column(name = "PROJECT_ID")
     private Long id;
+
     @Column(name = "PROJECT_NAME")
+    @NotEmpty
     private String name;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
+    @NotNull
     private Set<Product> products;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "PROJECT_ID")
+    @NotNull
     private Set<Criterion> criteria;
 
     public Long getId() {

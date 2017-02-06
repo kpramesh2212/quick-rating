@@ -1,5 +1,7 @@
 package com.ramesh.domain;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,8 +13,11 @@ public class Criterion {
     @GeneratedValue
     @Column(name = "CRITERION_ID")
     private Long id;
+
     @Column(name = "CRITERION_NAME")
+    @NotEmpty
     private String name;
+
     @Column(name = "WEIGHT")
     private Integer weight = 1;
 

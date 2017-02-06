@@ -1,5 +1,7 @@
 package com.ramesh.domain;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +13,9 @@ public class Product {
     @GeneratedValue
     @Column(name = "PRODUCT_ID")
     private Long id;
+
     @Column(name = "PRODUCT_NAME")
+    @NotEmpty
     private String name;
 
     public Long getId() {

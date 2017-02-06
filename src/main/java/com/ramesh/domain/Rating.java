@@ -1,6 +1,7 @@
 package com.ramesh.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Rating {
@@ -8,14 +9,20 @@ public class Rating {
     @GeneratedValue
     @Column(name = "RATING_ID")
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "PROJECT_ID")
+    @NotNull
     private Project project;
+
     @ManyToOne
     @JoinColumn(name = "PRODUCT_ID")
+    @NotNull
     private Product product;
+
     @ManyToOne
     @JoinColumn(name = "CRITERION_ID")
+    @NotNull
     private Criterion criterion;
 
     private Integer value;
