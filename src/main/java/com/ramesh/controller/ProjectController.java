@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/projects")
@@ -32,7 +33,7 @@ public class ProjectController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> createProject(@RequestBody Project project) {
+    public ResponseEntity<?> createProject(@Valid @RequestBody Project project) {
         projectRepository.save(project);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -45,7 +46,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateProject(@PathVariable Long projectId, @RequestBody Project
+    public ResponseEntity<?> updateProject(@PathVariable Long projectId, @Valid @RequestBody Project
             project) {
         verifyAndGetProject(projectId);
         project.setId(projectId);
