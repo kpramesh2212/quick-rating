@@ -4,6 +4,7 @@ import com.ramesh.error.ErrorDetail;
 import com.ramesh.error.ValidationError;
 import com.ramesh.exception.ResourceNotFoundException;
 
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,11 +15,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class RestExceptionHandler {
+    @Inject
+    private MessageSource messageSource;
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException rnfe,
@@ -53,9 +60,26 @@ public class RestExceptionHandler {
             }
             ValidationError ve = new ValidationError();
             ve.setCode(fieldError.getCode());
-            ve.setMessage(fieldError.getDefaultMessage());
+            ve.setMessage(messageSource.getMessage(fieldError, null));
             validationErrorList.add(ve);
         }
+        return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolationException
+            (ConstraintViolationException cve, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTitle("Validation Failed");
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setDetail("Input Field validation Failed");
+        errorDetail.setDeveloperMessage(cve.getClass().getName());
+
+        Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        for (ConstraintViolation<?> cv : constraintViolations) {
+        }
+
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
