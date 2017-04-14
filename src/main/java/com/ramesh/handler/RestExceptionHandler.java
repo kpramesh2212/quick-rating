@@ -5,12 +5,16 @@ import com.ramesh.error.ValidationError;
 import com.ramesh.exception.ResourceNotFoundException;
 
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,9 +27,23 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
-public class RestExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Inject
     private MessageSource messageSource;
+
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException
+                                                                          ex,
+                                                             HttpHeaders headers,
+                                                             HttpStatus status, WebRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(status.value());
+        errorDetail.setTitle("Message Not Readable");
+        errorDetail.setDetail(ex.getMessage());
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+
+        return handleExceptionInternal(ex, errorDetail, headers, status, request);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException rnfe,
@@ -40,9 +58,9 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorDetail, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException
-            (MethodArgumentNotValidException manve, HttpServletRequest request) {
+    public ResponseEntity<Object> handleMethodArgumentNotValid
+            (MethodArgumentNotValidException manve,
+             HttpHeaders headers, HttpStatus status, WebRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTitle("Validation Failed");
         errorDetail.setTimestamp(new Date().getTime());
@@ -63,7 +81,7 @@ public class RestExceptionHandler {
             ve.setMessage(messageSource.getMessage(fieldError, null));
             validationErrorList.add(ve);
         }
-        return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
+        return handleExceptionInternal(manve, errorDetail, headers, status, request);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -78,6 +96,21 @@ public class RestExceptionHandler {
 
         Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
         for (ConstraintViolation<?> cv : constraintViolations) {
+            String propertyClassName = cv.getRootBeanClass().getSimpleName();
+            String constraintName = cv.getConstraintDescriptor().getAnnotation().annotationType()
+                                  .getSimpleName();
+            String property = cv.getPropertyPath().toString();
+            final String code = constraintName + "." + propertyClassName.toLowerCase() + "." + property;
+
+            List<ValidationError> validationErrorList = errorDetail.getErrors().get(propertyClassName);
+            if (validationErrorList == null) {
+                validationErrorList = new ArrayList<>();
+                errorDetail.getErrors().put(propertyClassName, validationErrorList);
+            }
+            ValidationError ve = new ValidationError();
+            ve.setCode(cv.getMessage());
+            ve.setMessage(messageSource.getMessage(code, new Object[]{}, cv.getMessage(), null));
+            validationErrorList.add(ve);
         }
 
         return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
