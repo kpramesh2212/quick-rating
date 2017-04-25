@@ -51,10 +51,10 @@ public class QuickRatingApplication {
 
             @Autowired
             public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-                auth.userDetailsService(username -> {
-                    Account account = accountRepository.findByUsername(username);
+                auth.userDetailsService(email -> {
+                    Account account = accountRepository.findByEmail(email);
                     if (account != null) {
-                        return new User(account.getUsername(),
+                        return new User(account.getEmail(),
                                 account.getPassword(),
                                 true,
                                 true,
