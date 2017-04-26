@@ -1,5 +1,7 @@
 package com.ramesh.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Column;
@@ -8,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
+@JsonIgnoreProperties(value = {"id"}, allowGetters = true)
 public class Criterion {
     @Id
     @GeneratedValue

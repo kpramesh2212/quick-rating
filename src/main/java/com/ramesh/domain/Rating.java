@@ -1,9 +1,17 @@
 package com.ramesh.domain;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@JsonIgnoreProperties(value = {"id"}, allowGetters = true)
 public class Rating {
     @Id
     @GeneratedValue

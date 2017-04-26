@@ -1,6 +1,8 @@
 package com.ramesh.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Set;
@@ -17,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
+@JsonIgnoreProperties(value = {"admin", "id"}, allowGetters = true)
 public class Project {
     @Id
     @GeneratedValue
@@ -40,7 +43,7 @@ public class Project {
     private Set<Criterion> criteria;
 
     @OneToOne
-    @JoinColumn(name = "ADMIN_ID", referencedColumnName = "ID")
+    @JoinColumn(name = "ADMIN_ID")
     private Account admin;
 
     @OneToMany(cascade = CascadeType.ALL)

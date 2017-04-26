@@ -3,6 +3,7 @@ package com.ramesh.handler;
 import com.ramesh.error.ErrorDetail;
 import com.ramesh.error.ValidationError;
 import com.ramesh.exception.ResourceNotFoundException;
+import com.ramesh.exception.UnAuthorizedException;
 
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -56,6 +57,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         errorDetail.setDeveloperMessage(rnfe.getClass().getName());
 
         return new ResponseEntity<>(errorDetail, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<?> handleUnAuthorizedException(UnAuthorizedException rnfe,
+                                                             HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTitle("Unauthorized Exception");
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorDetail.setDetail(rnfe.getMessage());
+        errorDetail.setDeveloperMessage(rnfe.getClass().getName());
+
+        return new ResponseEntity<>(errorDetail, HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<Object> handleMethodArgumentNotValid
