@@ -1,11 +1,15 @@
 package com.ramesh.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
+@JsonIgnoreProperties(value = {"password"}, allowSetters = true)
 public class Account {
     @Id
     @GeneratedValue
@@ -21,6 +25,7 @@ public class Account {
     private String lastname;
 
     @Column(name = "PASSWORD")
+    @JsonIgnore
     private String password;
 
     public String getEmail() {

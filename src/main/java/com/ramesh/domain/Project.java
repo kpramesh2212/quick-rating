@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -37,6 +38,14 @@ public class Project {
     @Size(min = 1)
     @NotNull
     private Set<Criterion> criteria;
+
+    @OneToOne
+    @JoinColumn(name = "ADMIN_ID", referencedColumnName = "ID")
+    private Account admin;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "PROJECT_ID")
+    private Set<Rater> raters;
 
     public Long getId() {
         return id;
@@ -68,5 +77,21 @@ public class Project {
 
     public void setCriteria(Set<Criterion> criteria) {
         this.criteria = criteria;
+    }
+
+    public Account getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Account admin) {
+        this.admin = admin;
+    }
+
+    public Set<Rater> getRaters() {
+        return raters;
+    }
+
+    public void setRaters(Set<Rater> raters) {
+        this.raters = raters;
     }
 }
