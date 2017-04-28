@@ -6,10 +6,15 @@ import com.ramesh.domain.Product;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface ProductRepository extends CrudRepository<Product, Long> {
-    @Query(value = "select * from product where project_id=?1", nativeQuery = true)
-    Iterable<Product> findAll(Long projectId);
+
     @Query(value = "select * from product where project_id =?1 and product_id=?2", nativeQuery =
             true)
     Product findOne(Long projectId, Long productId);
+
+    @Query(value = "select * from product where project_id in ?1", nativeQuery = true)
+    Iterable<Product> findAllByProjectIdsIn(List<Long> projectId);
+
 }
