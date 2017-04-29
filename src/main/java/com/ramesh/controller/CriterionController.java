@@ -1,38 +1,35 @@
 package com.ramesh.controller;
 
 import com.ramesh.domain.Criterion;
+import com.ramesh.domain.Project;
 import com.ramesh.exception.ResourceNotFoundException;
 import com.ramesh.repository.CriterionRepository;
 
+import com.ramesh.repository.RepositoryUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.security.Principal;
+import java.util.List;
 
 @RestController
-@RequestMapping(value = "/projects/{projectId}/criteria")
+@RequestMapping(value = "/criteria")
 public class CriterionController {
     @Inject
     private CriterionRepository criterionRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getCriteria(@PathVariable Long projectId) {
-        return new ResponseEntity<>(criterionRepository.findAll(projectId), HttpStatus.OK);
+    public ResponseEntity<?> getCriteria(Principal principal) {
+        List<Long> productIds = RepositoryUtil.getProjectIdsWhereUserIsAdminOrRater(principal);
+        return new ResponseEntity<>(criterionRepository.findAllByProjectIdsIn(productIds), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{criterionId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getCriterion(@PathVariable Long projectId, @PathVariable Long
-            criterionId) {
-        Criterion criterion = criterionRepository.findOne(projectId, criterionId);
-        if (criterion == null) {
-            throw new ResourceNotFoundException("Criterion with id " + criterionId + " not found" +
-                    " for the project with id " + projectId);
-        }
-        return new ResponseEntity<>(criterion, HttpStatus.FOUND);
+    @RequestMapping(method = RequestMethod.GET, params = {"projectId"})
+    public ResponseEntity<?> getCriterion(@RequestParam Long projectId, Principal principal) {
+        Project project = RepositoryUtil.verifyAndGetProject(projectId, principal);
+        return new ResponseEntity<>(project.getCriteria(), HttpStatus.FOUND);
     }
 
 }
