@@ -3,15 +3,12 @@ package com.ramesh.controller;
 import com.ramesh.domain.Project;
 import com.ramesh.exception.UnAuthorizedException;
 import com.ramesh.repository.ProjectRepository;
+import com.ramesh.repository.RaterRepository;
 import com.ramesh.repository.RepositoryUtil;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,11 +21,19 @@ import javax.validation.Valid;
 public class ProjectController {
     @Inject
     private ProjectRepository projectRepository;
+    @Inject
+    private RaterRepository raterRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getProjects(Principal principal) {
-        final List<Project> projects =
-                RepositoryUtil.getProjectsWhereUserIsAdminOrRater(principal);
+    public ResponseEntity<?> getProjects(Principal principal,
+                                         @RequestParam(required = false, defaultValue = "false") boolean admin) {
+        Iterable<Project> projects = null;
+        final String email = principal.getName();
+        if (admin) {
+            projects = projectRepository.findAllByAdmin_Email(email);
+        } else {
+            projects = projectRepository.findDistinctByRatersIn(raterRepository.findAllByEmail(email));
+        }
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 

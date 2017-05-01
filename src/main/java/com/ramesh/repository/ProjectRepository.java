@@ -8,7 +8,13 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface ProjectRepository extends CrudRepository<Project, Long>{
-    List<Project> findDistinctByAdmin_EmailOrRatersIn(String adminEmail, List<Rater> rater);
+
     Project findByIdAndAdmin_Email(Long id, String adminEmail);
+
     Project findById(Long id);
+
+    Iterable<Project> findAllByAdmin_Email(String email);
+
+    Iterable<Project> findDistinctByRatersIn(Iterable<Rater> raters);
+
 }

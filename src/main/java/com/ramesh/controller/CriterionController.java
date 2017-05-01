@@ -21,8 +21,9 @@ public class CriterionController {
     private CriterionRepository criterionRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getCriteria(Principal principal) {
-        List<Long> productIds = RepositoryUtil.getProjectIdsWhereUserIsAdminOrRater(principal);
+    public ResponseEntity<?> getCriteria(Principal principal,
+                                         @RequestParam(required = false, defaultValue = "false") boolean admin) {
+        Iterable<Long> productIds = RepositoryUtil.getProjectIdsByEmail(principal.getName(), admin);
         return new ResponseEntity<>(criterionRepository.findAllByProjectIdsIn(productIds), HttpStatus.OK);
     }
 

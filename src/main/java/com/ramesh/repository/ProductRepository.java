@@ -15,6 +15,6 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
     Product findOne(Long projectId, Long productId);
 
     @Query(value = "select * from product where project_id in ?1", nativeQuery = true)
-    Iterable<Product> findAllByProjectIdsIn(List<Long> projectId);
+    Iterable<Product> findAllByProjectIdsIn(Iterable<Long> projectId);
 
 }

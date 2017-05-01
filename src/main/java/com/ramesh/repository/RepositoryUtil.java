@@ -27,20 +27,22 @@ public class RepositoryUtil {
         RepositoryUtil.accountRepository = accountRepository;
     }
 
-    public static List<Project> getProjectsWhereUserIsAdminOrRater(Principal principal) {
-        final List<Rater> raters = raterRepository.findAllByEmail(principal.getName());
-        final String adminEmail = principal.getName();
-        final List<Project> projects =
-                projectRepository.findDistinctByAdmin_EmailOrRatersIn(adminEmail, raters);
-        return projects;
+    public static Iterable<Long> getProjectIdsByEmail(String email, boolean admin) {
+        if (admin) {
+            return getProjectIds(projectRepository.findAllByAdmin_Email(email));
+        }
+        Iterable<Rater> raters = raterRepository.findAllByEmail(email);
+        return getProjectIds(projectRepository.findDistinctByRatersIn(raters));
     }
 
-    public static List<Long> getProjectIdsWhereUserIsAdminOrRater(Principal principal) {
-        List<Project> projects = getProjectsWhereUserIsAdminOrRater(principal);
-        final List<Long> projectIds = new ArrayList<>();
-        for (Project project : projects) {
+
+    private static Iterable<Long> getProjectIds(Iterable<Project> projects) {
+        List<Long> projectIds = new ArrayList<>();
+
+        for (Project project: projects) {
             projectIds.add(project.getId());
         }
+
         return projectIds;
     }
 
