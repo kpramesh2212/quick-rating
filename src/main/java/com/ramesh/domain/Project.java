@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@JsonIgnoreProperties(value = {"admin", "id"}, allowGetters = true)
+@JsonIgnoreProperties(value = {"admin"}, allowGetters = true)
 public class Project {
     @Id
     @GeneratedValue

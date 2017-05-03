@@ -38,7 +38,7 @@ public class QuickRatingApplication {
 		return new WebMvcConfigurerAdapter() {
 			public void addCorsMappings(CorsRegistry corsRegistry) {
 				corsRegistry.addMapping("/**").allowedOrigins("*")
-						.allowedMethods("POST", "GET", "DELETE", "PUT");
+						.allowedMethods("POST", "GET", "DELETE", "PUT", "PATCH");
 			}
 		};
 	}

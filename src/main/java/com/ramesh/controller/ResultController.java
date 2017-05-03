@@ -9,15 +9,17 @@ import com.ramesh.dto.ProductRatingCount;
 import com.ramesh.dto.ProjectRatingCount;
 import com.ramesh.repository.ProjectRepository;
 import com.ramesh.repository.RatingRepository;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 @RestController
 @RequestMapping(value = "/projects/{projectId}")
@@ -64,7 +66,7 @@ public class ResultController {
 
 
     private Integer getTotalRatingForCriterion(Long projectId, Long productId, Long criterionId) {
-        Iterable<Rating> ratings = ratingRepository.findAllByProjectProductAndCriterionId(projectId, productId, criterionId);
+        Iterable<Rating> ratings = null;
         int total = 0;
         for (Rating rating : ratings) {
             total += rating.getValue() * rating.getCriterion().getWeight();

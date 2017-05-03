@@ -8,10 +8,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@JsonIgnoreProperties(value = {"id"}, allowGetters = true)
+@JsonIgnoreProperties(value = {"id", "rater"}, allowGetters = true)
+@Table(
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "UNIQUE_RATING",
+                    columnNames = { "PROJECT_ID", "PRODUCT_ID", "CRITERION_ID", "RATER" }
+            )
+        }
+)
 public class Rating {
     @Id
     @GeneratedValue
@@ -33,7 +43,10 @@ public class Rating {
     @NotNull
     private Criterion criterion;
 
-    private Integer value;
+    @NotNull
+    private Integer value = 1;
+
+    private String rater;
 
     public Long getId() {
         return id;
@@ -74,4 +87,13 @@ public class Rating {
     public void setProject(Project project) {
         this.project = project;
     }
+
+    public String getRater() {
+        return rater;
+    }
+
+    public void setRater(String rater) {
+        this.rater = rater;
+    }
+
 }
