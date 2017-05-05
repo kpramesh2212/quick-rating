@@ -1,77 +1,64 @@
 package com.ramesh.controller;
 
-import com.ramesh.domain.Criterion;
-import com.ramesh.domain.Product;
-import com.ramesh.domain.Project;
 import com.ramesh.domain.Rating;
-import com.ramesh.dto.CriterionRatingCount;
-import com.ramesh.dto.ProductRatingCount;
-import com.ramesh.dto.ProjectRatingCount;
-import com.ramesh.repository.ProjectRepository;
+import com.ramesh.dto.Result;
 import com.ramesh.repository.RatingRepository;
 
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.BiPredicate;
 
 import javax.inject.Inject;
 
 @RestController
-@RequestMapping(value = "/projects/{projectId}")
+@RequestMapping(value = "/results")
 public class ResultController {
     @Inject private RatingRepository ratingRepository;
-    @Inject private ProjectRepository projectRepository;
 
-    @RequestMapping(value = "/results", method = RequestMethod.GET)
-    public ProjectRatingCount getResult(@PathVariable Long projectId) {
-        ProjectRatingCount prjCount = new ProjectRatingCount();
-        Integer projectTotal = 0;
-        Project project = projectRepository.findOne(projectId);
-        Set<Product> products = project.getProducts();
-        Set<Criterion> criteria = project.getCriteria();
-        List<ProductRatingCount> productRatingCountList = new ArrayList<>();
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<?> getResult(Principal principal,
+                                    @RequestParam(required = false, defaultValue = "false") boolean admin) {
+        final String email = principal.getName();
+        final List<Result> results = new ArrayList<>();
+        Iterable<Rating> ratings = null;
 
-        for (Product product : products) {
-            ProductRatingCount prCount = new ProductRatingCount();
-            Integer productTotal = 0;
-            List<CriterionRatingCount> criterionRatingCountList= new ArrayList<>();
-
-            for (Criterion criterion : criteria) {
-                CriterionRatingCount crCount = new CriterionRatingCount();
-                crCount.setCriterionId(criterion.getId());
-                Integer criterionTotal = getTotalRatingForCriterion(projectId, product.getId(), criterion.getId());
-                crCount.setTotal(criterionTotal);
-                criterionRatingCountList.add(crCount);
-                productTotal += criterionTotal;
-            }
-            projectTotal += productTotal;
-
-            prCount.setProductId(product.getId());
-            prCount.setTotal(productTotal);
-            prCount.setCriterionRatingCountList(criterionRatingCountList);
-            productRatingCountList.add(prCount);
+        if (admin) {
+            ratings = ratingRepository.findAllByProject_Admin_Email(email);
+        } else {
+            ratings = ratingRepository.findAllByRater(email);
         }
-
-        prjCount.setProjectId(projectId);
-        prjCount.setTotal(projectTotal);
-        prjCount.setProductRatingCountList(productRatingCountList);
-        return prjCount;
-
+        for (Rating rating : ratings) {
+            //Per Project
+            double total = rating.getValue() * rating.getCriterion().getWeight();
+            Long projectId = rating.getProject().getId();
+            Result projectResult = find(results, projectId, (result, id) -> result.getId() == id);
+            if (projectResult == null) {
+                projectResult = new Result();
+                results.add(projectResult);
+            }
+            projectResult.setId(projectId);
+            projectResult.setName(rating.getProject().getName());
+            projectResult.setTotal(projectResult.getTotal() + total);
+        }
+       return new ResponseEntity<>(results, HttpStatus.OK);
     }
 
 
-    private Integer getTotalRatingForCriterion(Long projectId, Long productId, Long criterionId) {
-        Iterable<Rating> ratings = null;
-        int total = 0;
-        for (Rating rating : ratings) {
-            total += rating.getValue() * rating.getCriterion().getWeight();
+    private <T, U> T find(Iterable<T> iterable, U t, BiPredicate<T, U> biPredicate) {
+        for (T it : iterable) {
+            if (biPredicate.test(it, t)) {
+                return it;
+            }
         }
-        return total;
+        return null;
     }
 
 }
